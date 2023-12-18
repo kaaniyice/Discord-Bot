@@ -1,22 +1,27 @@
 import discord
 from discord.ext import commands
 from discord import Interaction
-from dotenv import load_dotenv
 import os
+import sys
+import asyncio
 import random
+from dotenv import load_dotenv
 
 load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-SPYFALL_PLACES = os.getenv("SPYFALL_PLACES")
-LOL_HEROES = os.getenv("LOL_HEROES")
+BOT_TOKEN = os.getenv("BOT_TOKEN", None)
+LOL_HEROES = os.getenv("LOL_HEROES", None)
+SPYFALL_PLACES = os.getenv("SPYFALL_PLACES", None)
+GUILD_ID = os.getenv("GUILD_ID", None)
 
 bot = commands.Bot(command_prefix=".", intents=discord.Intents.all())
+random.seed()
 
 
+# General send message
 async def send_user_message(user, string):
     """
     general send message command.
-    :param user: usage discord.utils.get(bot.guilds[0].members, name=str(name))
+    :param user: discord.utils.get(bot.guilds[0].members, name=str(name))
     :param string: the string to send
     :return: None
     """
@@ -35,6 +40,7 @@ async def on_ready():
     print(f"{bot.user.name} is loggen in.")
 
 
+# Command for hello
 @bot.command(name='hello', help='says hello to current server/channel')
 async def hello(ctx):
     await ctx.send(f"Hello {bot.guilds[0]} server")
@@ -43,6 +49,18 @@ async def hello(ctx):
 @bot.command(name='greet', help='greets the user')
 async def greet(ctx):
     await ctx.send(f"Hi, {ctx.message.author.global_name}")
+
+
+# Command for DND
+@bot.command(name='dice', help='rolls a dice in between 1 - given value')
+async def dice(ctx, num=6):
+    try:
+        num = int(num)
+    except ValueError:
+        await ctx.send(f"Usage: .dice number")
+    else:
+        number = random.randint(1, num)
+        await ctx.send(f"Dice: {number}")
 
 
 # Command for checking direct message control of author
@@ -63,21 +81,18 @@ async def choose(ctx, *options):
     await ctx.send(random.choice(opt))
 
 
-# Command for rand select dice
-@bot.command(name='dice', help='rolls a dice in between 1 - given value')
-async def dice(ctx, num=6):
-    try:
-        num = int(num)
-    except ValueError:
-        await ctx.send(f"Usage: .dice number")
-    else:
-        number = random.randint(1, num)
-        await ctx.send(f"Dice: {number}")
+@bot.group(name='spyfall', help='spyfall game to play usage: .spyfall start @1person @2person @3person')
+async def spyfall(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send(f"Usage: .spyfall start  OR  .spyfall places")
 
 
-@bot.command(name='spyfall', help='spyfall game to play usage: .spyfall @person @2.person @3.person')
-async def spyfall(ctx, *who: discord.Member):
+@spyfall.command(name='start', help='spyfall game to play usage: .spyfall start @person @2.person @3.person')
+async def start(ctx, *who: discord.Member):
     members = [i for i in who]
+    if not len(members) > 0:
+        await ctx.send("Usage: .spyfall start @person @2.person @3.person")
+        return
     chosen_index = random.randint(0, len(members) - 1)
     spy = members[chosen_index]
     remaining_members = members[:chosen_index] + members[chosen_index + 1:]
@@ -92,10 +107,19 @@ async def spyfall(ctx, *who: discord.Member):
             await send_user_message(user, not_spy)
     user = discord.utils.get(bot.guilds[0].members, name=str(spy))
     await send_user_message(user, spy_message)
-    spyfall_places_string = ", ".join(str(element) for element in spyfall_places)
+    spyfall_places_string = "".join(str(element) for element in spyfall_places)
     await ctx.send(f"```{spyfall_places_string}```")
 
 
+@spyfall.command(name='places', help='shows places, usage: .spyfall places')
+async def places(ctx):
+    with open(SPYFALL_PLACES, 'r') as f:
+        spyfall_places = f.readlines()
+    spyfall_places_string = "".join(str(element) for element in spyfall_places)
+    await ctx.send(f"```{spyfall_places_string}```")
+
+
+# Command for Spyfall lol like game in bot
 @bot.command(name='spylol', help='spylol game to play usage: .spylol @person @2.person @3.person')
 async def spylol(ctx, *who: discord.Member):
     members = [i for i in who]
@@ -116,7 +140,7 @@ async def spylol(ctx, *who: discord.Member):
 
 @bot.command(name='clear', help='this command will clear msgs')
 async def clear(ctx, amount=5):
-    await ctx.channel.purge(limit=(amount+1))
+    await ctx.channel.purge(limit=(amount + 1))
     await ctx.send(f"Cleared **{amount}** messages")
 
 
