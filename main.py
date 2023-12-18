@@ -92,6 +92,8 @@ async def spyfall(ctx, *who: discord.Member):
             await send_user_message(user, not_spy)
     user = discord.utils.get(bot.guilds[0].members, name=str(spy))
     await send_user_message(user, spy_message)
+    spyfall_places_string = ", ".join(str(element) for element in spyfall_places)
+    await ctx.send(f"```{spyfall_places_string}```")
 
 
 @bot.command()
@@ -110,5 +112,6 @@ async def spylol(ctx, *who: discord.Member):
                         stringg = f"**{user.global_name}**, **{selected.global_name}**'s hero is : **{hero}**"
                         await send_user_message(user, stringg)
             chosen_index += 1
+
 
 bot.run(BOT_TOKEN)
