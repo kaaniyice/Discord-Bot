@@ -13,5 +13,9 @@ bot = commands.Bot(command_prefix=".", intents=discord.Intents.all())
 async def on_ready():
     print(f"{bot.user.name} is loggen in.")
 
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f"Hello {bot.guilds[0]} server")
+
 
 bot.run(BOT_TOKEN)
