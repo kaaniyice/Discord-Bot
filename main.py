@@ -17,6 +17,23 @@ async def on_ready():
     print(f"{bot.user.name} is loggen in.")
 
 
+async def send_user_message(user, string):
+    """
+    general send message command.
+    :param user: usage discord.utils.get(bot.guilds[0].members, name=str(name))
+    :param string: the string to send
+    :return: None
+    """
+    try:
+        await user.send(string)
+    except discord.Forbidden:
+        print(f"Error sending DM to user {user.name}: User has DMs disabled.")
+    except discord.HTTPException:
+        print(f"Error sending DM to user {user.name}: Bot has no permission to send DMs.")
+    except:
+        print(f"There was an error sending message to {user.name}")
+
+
 @bot.command()
 async def hello(ctx):
     await ctx.send(f"Hello {bot.guilds[0]} server")
@@ -56,6 +73,7 @@ async def dice(ctx, num=6):
         number = random.randint(1, num)
         await ctx.send(f"Dice: {number}")
 
+
 @bot.command()
 async def spyfall(ctx, *who: discord.Member):
     members = [i for i in who]
@@ -65,25 +83,13 @@ async def spyfall(ctx, *who: discord.Member):
     with open(SPYFALL_PLACES, 'r') as f:
         spyfall_places = f.readlines()
         place = random.choice(spyfall_places)
+    not_spy = f"You are ||**not the Spy**|| and the place is ||**{place}**||"
+    spy_message = f"You are ||**theeee Spy**|| and the place is ||**Unknown**||"
     for member in remaining_members:
         user = discord.utils.get(bot.guilds[0].members, name=str(member))
         if user:
-            try:
-                await user.send(f"You are ||**not the Spy**|| and the place is ||**{place}**||")
-            except discord.Forbidden:
-                print(f"Error sending DM to user {user.name}: User has DMs disabled.")
-            except discord.HTTPException:
-                print(f"Error sending DM to user {user.name}: Bot has no permission to send DMs.")
-            except:
-                print(f"There was an error sending message to {user.name}")
+            await send_user_message(user, not_spy)
     user = discord.utils.get(bot.guilds[0].members, name=str(spy))
-    try:
-        await user.send(f"You are ||**theeee Spy**|| and the place is ||**Unknown**||")
-    except discord.Forbidden:
-        print(f"Error sending DM to user {user.name}: User has DMs disabled.")
-    except discord.HTTPException:
-        print(f"Error sending DM to user {user.name}: Bot has no permission to send DMs.")
-    except:
-        print(f"There was an error sending message to {user.name}")
+    await send_user_message(user, spy_message)
 
 bot.run(BOT_TOKEN)
