@@ -35,18 +35,18 @@ async def on_ready():
     print(f"{bot.user.name} is loggen in.")
 
 
-@bot.command()
+@bot.command(name='hello', help='says hello to current server/channel')
 async def hello(ctx):
     await ctx.send(f"Hello {bot.guilds[0]} server")
 
 
-@bot.command()
+@bot.command(name='greet', help='greets the user')
 async def greet(ctx):
     await ctx.send(f"Hi, {ctx.message.author.global_name}")
 
 
 # Command for checking direct message control of author
-@bot.command()
+@bot.command(name='directmessage', help='says Hello via DM message to user')
 async def directmessage(ctx):
     try:
         await ctx.message.author.send("Hello")
@@ -57,14 +57,14 @@ async def directmessage(ctx):
 
 
 # Command for choosing a list of things
-@bot.command()
+@bot.command(name='choose', help='chooses one variable in a given list')
 async def choose(ctx, *options):
     opt = [i for i in options]
     await ctx.send(random.choice(opt))
 
 
 # Command for rand select dice
-@bot.command()
+@bot.command(name='dice', help='rolls a dice in between 1 - given value')
 async def dice(ctx, num=6):
     try:
         num = int(num)
@@ -75,7 +75,7 @@ async def dice(ctx, num=6):
         await ctx.send(f"Dice: {number}")
 
 
-@bot.command()
+@bot.command(name='spyfall', help='spyfall game to play usage: .spyfall @person @2.person @3.person')
 async def spyfall(ctx, *who: discord.Member):
     members = [i for i in who]
     chosen_index = random.randint(0, len(members) - 1)
@@ -96,7 +96,7 @@ async def spyfall(ctx, *who: discord.Member):
     await ctx.send(f"```{spyfall_places_string}```")
 
 
-@bot.command()
+@bot.command(name='spylol', help='spylol game to play usage: .spylol @person @2.person @3.person')
 async def spylol(ctx, *who: discord.Member):
     members = [i for i in who]
     chosen_index = 0
@@ -117,6 +117,7 @@ async def spylol(ctx, *who: discord.Member):
 @bot.command(name='clear', help='this command will clear msgs')
 async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=(amount+1))
+    await ctx.send(f"Cleared **{amount}** messages")
 
 
 bot.run(BOT_TOKEN)
