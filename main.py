@@ -8,13 +8,9 @@ import random
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 SPYFALL_PLACES = os.getenv("SPYFALL_PLACES")
+LOL_HEROES = os.getenv("LOL_HEROES")
 
 bot = commands.Bot(command_prefix=".", intents=discord.Intents.all())
-
-
-@bot.event
-async def on_ready():
-    print(f"{bot.user.name} is loggen in.")
 
 
 async def send_user_message(user, string):
@@ -32,6 +28,11 @@ async def send_user_message(user, string):
         print(f"Error sending DM to user {user.name}: Bot has no permission to send DMs.")
     except:
         print(f"There was an error sending message to {user.name}")
+
+
+@bot.event
+async def on_ready():
+    print(f"{bot.user.name} is loggen in.")
 
 
 @bot.command()
@@ -91,5 +92,23 @@ async def spyfall(ctx, *who: discord.Member):
             await send_user_message(user, not_spy)
     user = discord.utils.get(bot.guilds[0].members, name=str(spy))
     await send_user_message(user, spy_message)
+
+
+@bot.command()
+async def spylol(ctx, *who: discord.Member):
+    members = [i for i in who]
+    chosen_index = 0
+    with open(LOL_HEROES, 'r') as f:
+        heroes = f.readlines()
+        for _ in range(len(members)):
+            selected = discord.utils.get(bot.guilds[0].members, name=str(members[chosen_index]))
+            hero = random.choice(heroes)
+            for member in members:
+                if not member == members[chosen_index]:
+                    user = discord.utils.get(bot.guilds[0].members, name=str(member))
+                    if user:
+                        stringg = f"**{user.global_name}**, **{selected.global_name}**'s hero is : **{hero}**"
+                        await send_user_message(user, stringg)
+            chosen_index += 1
 
 bot.run(BOT_TOKEN)
