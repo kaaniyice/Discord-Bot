@@ -21,7 +21,7 @@ random.seed()
 async def send_user_message(user, string):
     """
     general send message command.
-    :param user: discord.utils.get(bot.guilds[0].members, name=str(name))
+    :param user: name of the user
     :param string: the string to send
     :return: None
     """
