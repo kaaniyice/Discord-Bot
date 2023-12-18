@@ -41,7 +41,7 @@ async def directmessage(ctx):
 @bot.command()
 async def choose(ctx, *options):
     opt = [i for i in options]
-    await ctx.send(opt[random.randint(0, len(opt) - 1)])
+    await ctx.send(random.choice(opt))
 
 
 bot.run(BOT_TOKEN)
