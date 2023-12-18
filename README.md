@@ -10,9 +10,9 @@ From there create a new application
 in BOT tab copy your token and make a .env file.
 Configure your env file as follows:
 
-BOT_TOKEN = "YOUR_BOT_TOKEN"
-
-GUILD_ID = "YOUR_GUILD_ID"
+    BOT_TOKEN = "YOUR_BOT_TOKEN"
+  
+    GUILD_ID = "YOUR_GUILD_ID"
 
 
 then for invite the bot to your server:
