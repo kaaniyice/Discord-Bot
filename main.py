@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import Interaction
 from dotenv import load_dotenv
 import os
+import random
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -34,6 +35,13 @@ async def directmessage(ctx):
         print(f"Error sending DM to user : User has DMs disabled.")
     except discord.HTTPException:
         print(f"Error sending DM to user : Bot has no permission to send DMs.")
+
+
+# Command for choosing a list of things
+@bot.command()
+async def choose(ctx, *options):
+    opt = [i for i in options]
+    await ctx.send(opt[random.randint(0, len(opt) - 1)])
 
 
 bot.run(BOT_TOKEN)
