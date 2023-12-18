@@ -44,4 +44,16 @@ async def choose(ctx, *options):
     await ctx.send(random.choice(opt))
 
 
+# Command for rand select dice
+@bot.command()
+async def dice(ctx, num=6):
+    try:
+        num = int(num)
+    except ValueError:
+        await ctx.send(f"Usage: .dice number")
+    else:
+        number = random.randint(1, num)
+        await ctx.send(f"Dice: {number}")
+
+
 bot.run(BOT_TOKEN)
