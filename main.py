@@ -114,4 +114,9 @@ async def spylol(ctx, *who: discord.Member):
             chosen_index += 1
 
 
+@bot.command(name='clear', help='this command will clear msgs')
+async def clear(ctx, amount=5):
+    await ctx.channel.purge(limit=(amount+1))
+
+
 bot.run(BOT_TOKEN)
